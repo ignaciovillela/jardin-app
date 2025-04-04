@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Detalle de solicitud</h2>
+
+  <p><strong>Tipo de servicio:</strong> {{ solicitud.get_service_type_display }}</p>
+  <p><strong>Metros cuadrados:</strong> {{ solicitud.square_meters }}</p>
+  <p><strong>Disponibilidad:</strong> {{ solicitud.availability }}</p>
+  <p><strong>Descripción:</strong> {{ solicitud.description|default:"(sin descripción)" }}</p>
+  <p><strong>Fecha:</strong> {{ solicitud.created_at|date:"d/m/Y H:i" }}</p>
+
+  {% if solicitud.latitude and solicitud.longitude %}
+    <hr>
+    <h3>Ubicación</h3>
+    <div id="map" style="height: 400px; border: 1px solid #ccc;"></div>
+
+    <!-- Leaflet CSS y JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <script>
+      const lat = {{ solicitud.latitude }};
+      const lng = {{ solicitud.longitude }};
+
+      const map = L.map('map').setView([lat, lng], 16);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      L.marker([lat, lng]).addTo(map)
+        .bindPopup("Ubicación solicitada")
+        .openPopup();
+    </script>
+  {% else %}
+    <p><em>No se especificó ubicación en esta solicitud.</em></p>
+  {% endif %}
+{% endblock %}

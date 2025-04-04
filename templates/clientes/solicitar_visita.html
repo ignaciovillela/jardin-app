@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Solicitar visita de jardinería</h2>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div>
+      <label for="id_service_type">Tipo de servicio:</label>
+      {{ form.service_type }}
+    </div>
+
+    <div>
+      <label for="id_square_meters">Metros cuadrados:</label>
+      {{ form.square_meters }}
+    </div>
+
+    <div>
+      <label for="id_availability">Disponibilidad horaria:</label>
+      {{ form.availability }}
+    </div>
+
+    <div>
+      <label for="id_description">Detalles adicionales:</label>
+      {{ form.description }}
+    </div>
+
+    <hr>
+    <h3>Ubicación en el mapa</h3>
+    <p>Selecciona en el mapa o permite al navegador obtener tu ubicación.</p>
+    <div id="map" style="height: 400px; border: 1px solid #ccc; margin-bottom: 10px;"></div>
+
+    {{ form.latitude.as_hidden }}
+    {{ form.longitude.as_hidden }}
+
+    <button type="submit">Enviar solicitud</button>
+  </form>
+
+  <!-- Leaflet CSS y JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+  <script>
+    const latInput = document.getElementById('id_latitude');
+    const lngInput = document.getElementById('id_longitude');
+
+    const defaultLat = -33.45;  // Santiago de Chile
+    const defaultLng = -70.65;
+
+    const map = L.map('map').setView([defaultLat, defaultLng], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = L.marker([defaultLat, defaultLng]).addTo(map);
+    latInput.value = defaultLat;
+    lngInput.value = defaultLng;
+
+    // Actualiza campos ocultos
+    function setMarkerAndInputs(lat, lng) {
+      marker.setLatLng([lat, lng]);
+      latInput.value = lat.toFixed(6);
+      lngInput.value = lng.toFixed(6);
+    }
+
+    // Click manual en el mapa
+    map.on('click', function (e) {
+      const { lat, lng } = e.latlng;
+      setMarkerAndInputs(lat, lng);
+    });
+
+    // Obtener ubicación actual si se permite
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          map.setView([lat, lng], 16);
+          setMarkerAndInputs(lat, lng);
+        },
+        function (error) {
+          console.warn('Ubicación no disponible o denegada.');
+        }
+      );
+    }
+  </script>
+{% endblock %}

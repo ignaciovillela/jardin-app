@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{% if es_admin %}Todas las citas{% else %}Mis citas{% endif %}</h2>
+
+{% if citas %}
+<table>
+  <thead>
+    <tr>
+      {% if es_admin %}<th>Cliente</th>{% endif %}
+      <th>Servicio</th>
+      <th>Jardinero</th>
+      <th>Fecha</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cita in citas %}
+    <tr>
+      {% if es_admin %}
+        <td>{{ cita.solicitud.cliente.user.username }}</td>
+      {% endif %}
+      <td>{{ cita.solicitud.get_service_type_display }}</td>
+      <td>{{ cita.jardinero.name }}</td>
+      <td>{{ cita.fecha_programada|date:"d/m/Y H:i" }}</td>
+      <td>{{ cita.get_estado_display }}</td>
+      <td>
+        {% if es_admin %}
+          {% if cita.estado != 'completed' and cita.estado != 'canceled' %}
+            <a href="{% url 'detalle_cita' cita.id %}">Cambiar estado</a>
+          {% else %}
+            -
+          {% endif %}
+        {% else %}
+          {% if cita.estado == 'pending' and cita.jardinero %}
+            <a href="{% url 'confirmar_cita' cita.id %}">Confirmar</a>
+          {% elif cita.estado == 'confirmed' %}
+            Esperando ejecución
+          {% elif cita.estado == 'completed' and not cita.calificacion %}
+            <a href="{% url 'calificar_cita' cita.id %}">Calificar</a>
+          {% else %}
+            -
+          {% endif %}
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+  <p>No hay citas disponibles.</p>
+{% endif %}
+{% endblock %}

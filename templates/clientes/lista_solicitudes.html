@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Mis Solicitudes</h2>
+<ul>
+    {% for solicitud in solicitudes %}
+        <li>
+            <a href="{% url 'detalle_solicitud' solicitud.id %}">
+                {{ solicitud.get_service_type_display }} ({{ solicitud.created_at|date:"d/m/Y" }})
+            </a>
+        </li>
+    {% empty %}
+        <li>No tienes solicitudes aún.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

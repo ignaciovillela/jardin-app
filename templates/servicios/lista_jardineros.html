@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Lista de jardineros</h2>
+<a href="{% url 'crear_jardinero' %}">Crear nuevo jardinero</a>
+<ul>
+  {% for jardinero in jardineros %}
+    <li>
+      {{ jardinero.name }} - {{ jardinero.get_specialty_display }}
+      <a href="{% url 'editar_jardinero' jardinero.id %}">Editar</a> |
+      <a href="{% url 'eliminar_jardinero' jardinero.id %}">Eliminar</a>
+    </li>
+  {% empty %}
+    <li>No hay jardineros registrados.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

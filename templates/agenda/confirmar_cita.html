@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Confirmar cita</h2>
+  <p>¿Confirmas tu cita con <strong>{{ object.jardinero.name }}</strong> el <strong>{{ object.fecha_programada|date:"d/m/Y H:i" }}</strong>?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Confirmar cita</button>
+  </form>
+{% endblock %}

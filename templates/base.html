@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}JardinApp{% endblock %}</title>
+</head>
+<body>
+<header>
+    <nav>
+        <a href="{% url 'inicio' %}">Inicio</a>
+        {% if user.is_authenticated %}
+            {% if user.is_superuser %}
+                | <a href="/admin/">Admin</a>
+                | <a href="{% url 'asignar_cita' %}">Asignar cita</a>
+            {% else %}
+                | <a href="{% url 'solicitar_visita' %}">Solicitar</a>
+                | <a href="{% url 'lista_solicitudes_cliente' %}">Mis solicitudes</a>
+            {% endif %}
+            | <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Cerrar sesión</button>
+        </form>
+
+        {% else %}
+            | <a href="{% url 'registro' %}">Registro</a>
+            | <a href="{% url 'login' %}">Entrar</a>
+        {% endif %}
+    </nav>
+</header>
+
+<hr>
+
+{% block content %}{% endblock %}
+</body>
+</html>

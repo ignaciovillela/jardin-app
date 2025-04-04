@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Bienvenido a JardinApp</h1>
+
+    {% if user.is_authenticated %}
+        <p>Hola, {{ user.get_full_name|default:user.username }}.</p>
+
+        {% if user.is_superuser %}
+            <p><strong>Panel de administración:</strong></p>
+            <ul>
+                <li><a href="/admin/">Admin Django</a></li>
+                <li><a href="{% url 'asignar_cita' %}">Asignar cita</a></li>
+      <li><a href="{% url 'lista_citas' %}">Ver todas las citas</a></li>
+      <li><a href="{% url 'lista_jardineros' %}">Administrar jardineros</a></li>
+            </ul>
+        {% else %}
+            <p><strong>Opciones para clientes:</strong></p>
+            <ul>
+                <li><a href="{% url 'solicitar_visita' %}">Solicitar visita</a></li>
+                <li><a href="{% url 'lista_solicitudes_cliente' %}">Mis solicitudes</a></li>
+            </ul>
+        {% endif %}
+
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Cerrar sesión</button>
+        </form>
+
+
+    {% else %}
+        <p><a href="{% url 'registro' %}">Registrarse</a> o <a href="{% url 'login' %}">Iniciar sesión</a></p>
+    {% endif %}
+{% endblock %}

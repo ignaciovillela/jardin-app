@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Asignar jardinero a solicitud</h2>
+
+  <form method="post" id="asignar-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Asignar</button>
+  </form>
+
+  <hr>
+
+  <div id="detalle-solicitud" style="display:none;">
+    <h3>Detalle de la solicitud seleccionada:</h3>
+    <p><strong>Cliente:</strong> <span id="cliente"></span></p>
+    <p><strong>Dirección:</strong> <span id="direccion"></span></p>
+    <p><strong>Tipo de servicio:</strong> <span id="tipo_servicio"></span></p>
+    <p><strong>Metros cuadrados:</strong> <span id="m2"></span> m²</p>
+    <p><strong>Disponibilidad:</strong> <span id="disponibilidad"></span></p>
+    <p><strong>Descripción:</strong> <span id="descripcion"></span></p>
+    <div id="mapa" style="height: 300px;"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+
+  <script>
+    const solicitudes = {
+      {% for s in solicitudes %}
+      "{{ s.id }}": {
+        cliente: "{{ s.customer.name|escapejs }}",
+        direccion: "{{ s.customer.address|escapejs }}",
+        tipo_servicio: "{{ s.get_service_type_display|escapejs }}",
+        m2: "{{ s.square_meters }}",
+        disponibilidad: "{{ s.availability|escapejs }}",
+        descripcion: "{{ s.description|default:'-'|escapejs }}",
+        lat: {{ s.latitude|default:'null' }},
+        lon: {{ s.longitude|default:'null' }}
+      },
+      {% endfor %}
+    };
+
+    const select = document.getElementById('id_solicitud');
+    const div = document.getElementById('detalle-solicitud');
+
+    let map = null;
+    let marker = null;
+
+    select.addEventListener('change', function() {
+      const selected = solicitudes[this.value];
+      if (selected) {
+        div.style.display = 'block';
+        document.getElementById('cliente').textContent = selected.cliente;
+        document.getElementById('direccion').textContent = selected.direccion;
+        document.getElementById('tipo_servicio').textContent = selected.tipo_servicio;
+        document.getElementById('m2').textContent = selected.m2;
+        document.getElementById('disponibilidad').textContent = selected.disponibilidad;
+        document.getElementById('descripcion').textContent = selected.descripcion;
+
+        if (selected.lat && selected.lon) {
+          if (!map) {
+            map = L.map('mapa').setView([selected.lat, selected.lon], 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+          } else {
+            map.setView([selected.lat, selected.lon], 16);
+          }
+
+          if (marker) {
+            marker.setLatLng([selected.lat, selected.lon]);
+          } else {
+            marker = L.marker([selected.lat, selected.lon]).addTo(map);
+          }
+
+          marker.bindPopup(selected.direccion).openPopup();
+        }
+      } else {
+        div.style.display = 'none';
+      }
+    });
+  </script>
+{% endblock %}

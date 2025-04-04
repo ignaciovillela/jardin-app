@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Detalle de la Cita</h2>
+
+<p><strong>Cliente:</strong> {{ cita.solicitud.cliente.user.username }}</p>
+<p><strong>Servicio:</strong> {{ cita.solicitud.get_service_type_display }}</p>
+<p><strong>Jardinero:</strong> {{ cita.jardinero.name }}</p>
+<p><strong>Fecha:</strong> {{ cita.fecha_programada|date:"d/m/Y H:i" }}</p>
+<p><strong>Estado:</strong> {{ cita.get_estado_display }}</p>
+<p><strong>Notas:</strong> {{ cita.notas|default:"-" }}</p>
+
+{% if es_admin %}
+  <hr>
+  <h3>Cambiar estado</h3>
+  <form method="post">
+    {% csrf_token %}
+    <select name="nuevo_estado">
+      {% for estado in estados_disponibles %}
+        <option value="{{ estado }}" {% if estado == cita.estado %}selected{% endif %}>
+          {{ estado|capfirst }}
+        </option>
+      {% endfor %}
+    </select>
+    <button type="submit">Guardar</button>
+  </form>
+{% endif %}
+
+{% if not es_admin %}
+  {% if cita.estado == 'completed' and not cita.calificacion %}
+    <hr>
+    <h3>¿Cómo estuvo el servicio?</h3>
+    <a href="{% url 'calificar_cita' cita.id %}" class="btn btn-primary">Calificar</a>
+  {% elif cita.calificacion %}
+    <p><strong>Calificación:</strong> {{ cita.calificacion }} / 5</p>
+    <p><strong>Comentario:</strong> {{ cita.comentario|default:"(sin comentario)" }}</p>
+  {% endif %}
+{% endif %}
+
+<a href="{% url 'lista_citas' %}">← Volver a la lista</a>
+{% endblock %}

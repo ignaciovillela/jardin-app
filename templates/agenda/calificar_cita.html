@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Calificar jardinero</h2>
+
+  <p><strong>Servicio:</strong> {{ cita.solicitud.get_service_type_display }}</p>
+  <p><strong>Jardinero:</strong> {{ cita.jardinero.name }}</p>
+  <p><strong>Fecha:</strong> {{ cita.fecha_programada|date:"d/m/Y H:i" }}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enviar calificación</button>
+  </form>
+
+  <a href="{% url 'lista_citas' %}">← Volver</a>
+{% endblock %}
