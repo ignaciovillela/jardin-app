@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.py,cover
+*.so
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+local_settings.py
+media/
+
+# PyCharm
+.idea/
+*.iml
+
+# VSCode
+.vscode/
+!.vscode/settings.json
+
+# System
+.DS_Store
+.env
+*.log
